@@ -24,39 +24,87 @@ func TestMissing(t *testing.T) {
 }
 
 // Test basic usage
-func TestBasicBlog(t *testing.T) {
+func TestBasicBlogHeaderFirst(t *testing.T) {
 
-	h := New("_test/blog.txt")
+	// We test two input-files with different separators.
+	files := []string{"_test/blog.txt", "_test/blog2.txt"}
 
-	headers, err := h.Headers()
-	if err != nil {
-		t.Errorf("error reading headers of blog-post: %s\n", err.Error())
-	}
+	for _, file := range files {
+		h := New(file)
 
-	body := ""
-	body, err = h.Body()
-	if err != nil {
-		t.Errorf("error reading body of blog-post: %s\n", err.Error())
-	}
+		headers, err := h.Headers()
+		if err != nil {
+			t.Errorf("error reading headers of blog-post: %s\n", err.Error())
+		}
 
-	//
-	// Ok we should have a body, and some headers.
-	//
-	for header, value := range headers {
+		body := ""
+		body, err = h.Body()
+		if err != nil {
+			t.Errorf("error reading body of blog-post: %s\n", err.Error())
+		}
 
-		switch header {
-		case "subject", "date", "tags":
-			// nop
-		default:
-			t.Errorf("unknown header '%s' (value:%s) in file", header, value)
+		//
+		// Ok we should have a body, and some headers.
+		//
+		for header, value := range headers {
+
+			switch header {
+			case "subject", "date", "tags":
+				// nop
+			default:
+				t.Errorf("unknown header '%s' (value:%s) in file", header, value)
+			}
+		}
+
+		//
+		// Expected body
+		//
+		if body != "This is my blog post ..\n\n" {
+			t.Errorf("body did not match expectations: '%s'\n", body)
 		}
 	}
+}
 
-	//
-	// Expected body
-	//
-	if body != "This is my blog post ..\n\n" {
-		t.Errorf("body did not match expectations: '%s'\n", body)
+// Test basic usage
+func TestBasicBlogBodyFirst(t *testing.T) {
+
+	// We test two input-files with different separators.
+	files := []string{"_test/blog.txt", "_test/blog2.txt"}
+
+	for _, file := range files {
+		h := New(file)
+
+		// Parse body first
+		body, err := h.Body()
+		if err != nil {
+			t.Errorf("error reading body of blog-post: %s\n", err.Error())
+		}
+
+		// Now parse headers
+		headers, err2 := h.Headers()
+		if err2 != nil {
+			t.Errorf("error reading headers of blog-post: %s\n", err.Error())
+		}
+
+		//
+		// Ok we should have a body, and some headers.
+		//
+		for header, value := range headers {
+
+			switch header {
+			case "subject", "date", "tags":
+				// nop
+			default:
+				t.Errorf("unknown header '%s' (value:%s) in file", header, value)
+			}
+		}
+
+		//
+		// Expected body
+		//
+		if body != "This is my blog post ..\n\n" {
+			t.Errorf("body did not match expectations: '%s'\n", body)
+		}
 	}
 }
 
