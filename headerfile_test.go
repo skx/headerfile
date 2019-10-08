@@ -5,6 +5,24 @@ import (
 	"testing"
 )
 
+// Test reading a file that doesn't exist
+func TestMissing(t *testing.T) {
+
+	h := New("_test/missing/file/goes/here")
+
+	_, err := h.Headers()
+	if err == nil {
+		t.Errorf("expected an error reading a missing file; saw none. [1/2]")
+	}
+
+	b := New("_test/missing/file/goes/here")
+	_, err2 := b.Body()
+	if err2 == nil {
+		t.Errorf("expected an error reading a missing file; saw none. [2/2]")
+	}
+
+}
+
 // Test basic usage
 func TestBasicBlog(t *testing.T) {
 
