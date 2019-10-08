@@ -22,14 +22,26 @@ rm $t
 set -e
 
 # Run the linter
-echo "Launching linter .."
+echo "Launching 'golint' check .."
 golint -set_exit_status ./...
-echo "Completed linter .."
+echo "Completed 'golint' check .."
 
 # Run the vet-check
-echo "Launching shadowed-variable check .."
+echo "Launching 'go vet' check .."
 go vet ./...
-echo "Completed shadowed-variable check .."
+echo "Completed 'go vet' check .."
 
-# Run golang tests
+# Run our package tests
 go test ./...
+
+#
+# Test coverage not being 100% is a bug.
+#
+coverage=$(go test -coverprofile=tmp | grep coverage | awk '{print $2}')
+
+if [ "${coverage}" == "100.0%" ]; then
+    echo "100% test-coverage.  Good job"
+else
+    echo "Coverage is ${coverage} not 100%"
+    exit 1
+fi

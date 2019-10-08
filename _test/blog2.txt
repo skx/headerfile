@@ -1,0 +1,5 @@
+Subject= This is my post
+Date = 10th March 1980
+Tags =foo, bar, baz
+
+This is my blog post ..
