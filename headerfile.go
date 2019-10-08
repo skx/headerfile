@@ -38,6 +38,10 @@ func New(filename string) *HeaderFile {
 		headers: make(map[string]string)}
 }
 
+// parse parses the input file we were constructed with.
+//
+// This is called the first time a header/body is requested
+// from the package.  We don't re-read the file on-demand.
 func (h *HeaderFile) parse() error {
 
 	// Read the file
@@ -46,10 +50,8 @@ func (h *HeaderFile) parse() error {
 		return err
 	}
 
-	headerRegex, rErr := regexp.Compile("^([^:]+):(.*)$")
-	if rErr != nil {
-		return rErr
-	}
+	// Compile our regular expression
+	headerRegex := regexp.MustCompile("^([^:=]+)[:=](.*)$")
 
 	// We're in the header by default
 	header := true
@@ -82,6 +84,7 @@ func (h *HeaderFile) parse() error {
 
 				// Normalize keys & values.
 				key = strings.ToLower(key)
+				key = strings.TrimSpace(key)
 				val = strings.TrimSpace(val)
 
 				h.headers[key] = val
